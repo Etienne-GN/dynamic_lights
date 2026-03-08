@@ -867,11 +867,15 @@ function handleEntity(entity) {
   if (entity instanceof Player4) {
     const playerEquipment = entity.getComponent(EntityEquippableComponent.componentId);
     const mainHand = playerEquipment.getEquipment(EquipmentSlot.Mainhand);
-    if (!mainHand || !iluminatedItems.includes(mainHand.typeId) && !itemEmitsLight(mainHand)) {
+    const offHand = playerEquipment.getEquipment(EquipmentSlot.Offhand);
+    const mainHandEmits = mainHand && (iluminatedItems.includes(mainHand.typeId) || itemEmitsLight(mainHand));
+    const offHandEmits = offHand && (iluminatedItems.includes(offHand.typeId) || itemEmitsLight(offHand));
+    if (!mainHandEmits && !offHandEmits) {
       const engine2 = IluminationEngines.get(entity.id);
       return engine2?.clear();
     }
-    engine = constructLightEngine({ entity, itemStack: mainHand, dimension: world5.getDimension(entity.dimension.id) });
+    const itemStack = mainHandEmits ? mainHand : offHand;
+    engine = constructLightEngine({ entity, itemStack, dimension: world5.getDimension(entity.dimension.id) });
   } else
     engine = constructLightEngine(entity);
   if (!engine)
@@ -918,3 +922,21 @@ function getItem(source) {
   const entityItemComponent = source.getComponent(EntityItemComponent4.componentId);
   return entityItemComponent?.itemStack;
 }
+world5.beforeEvents.itemUse.subscribe((event) => {
+  const { source: player, itemStack } = event;
+  if (!iluminatedItems.includes(itemStack.typeId) && !itemEmitsLight(itemStack))
+    return;
+  const equippable = player.getComponent(EntityEquippableComponent.componentId);
+  if (!equippable)
+    return;
+  const offHand = equippable.getEquipment(EquipmentSlot.Offhand);
+  if (offHand)
+    return;
+  system.run(() => {
+    const currentItem = equippable.getEquipment(EquipmentSlot.Mainhand);
+    if (!currentItem || currentItem.typeId !== itemStack.typeId)
+      return;
+    equippable.setEquipment(EquipmentSlot.Offhand, currentItem);
+    equippable.setEquipment(EquipmentSlot.Mainhand, void 0);
+  });
+});
