@@ -28,7 +28,7 @@ Real-time lighting effects for held items, entities, and projectiles.
 
 ## 🛠 Build Instructions
 To create the `.mcaddon` file for testing:
-1. From the project root, run: `./package_addon.sh dynamic_lights`
+1. From the project root, run: `./package_addon.sh DynamicLight`
 
 ## 📜 Changelog
 
