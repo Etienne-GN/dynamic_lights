@@ -32,7 +32,6 @@ var ItemIlumination = {
   "minecraft:crying_obsidian": 2,
   "minecraft:campfire": 12,
   "minecraft:dragon_breath": 7,
-  "minecraft:ender_eye": 5,
   "minecraft:fire_charge": 7,
   "minecraft:nether_star": 8,
   "minecraft:experience_bottle": 7,
